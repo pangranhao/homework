@@ -37,6 +37,7 @@ public class Empserviceiml implements Empservice {
     }
 
     @Override
+    //批量删除
     public void deleteempall(String str) {
         Map map=new HashMap<>();
         map.put("str",str);
