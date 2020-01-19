@@ -88,15 +88,24 @@
                     }},
                 {title:"领导姓名", data: 'leadername' },
                 {title:"部门名称", data: 'deptname' },
-                { title:"操作",data: 'bid', "render": function ( data, type, full, meta ) {
-                        var str='<button onclick="toUpdate('+data+')" class="btn btn-primary">修改</button><button  onclick="deletebook('+data+')" class="btn btn-danger">下架</button>';
+                { title:"操作",data: 'id', "render": function ( data, type, full, meta ) {
+                        var str='<button onclick="toUpdate('+data+')" class="btn btn-primary">修改</button><button  onclick="deleteemp('+data+')" class="btn btn-danger">删除</button>';
                         return str;
                     }},
             ]
 
         });
     }
-
+function deleteemp(id) {
+    $.post({
+        url:"http://localhost:8088/emp/deleteemp",
+        data:{"id":id},
+        dataType:"json",
+        success:function () {
+            table1.ajax.reload();
+        }
+    })
+}
     //===============时间格式化+删除=====================
     function timestampToTime(date) {
         Y = date.getFullYear() + '-';
@@ -105,13 +114,74 @@
         return Y+M+D;
 
     }
+
+    function dian(c) {
+        var arr=document.getElementsByName("box");
+        for (var i = 0; i < arr.length; i++) {
+            if (c==1) {
+                arr[i].checked=true;
+            } if (c==2) {
+                arr[i].checked=!arr[i].checked;
+            }if (c==3) {
+                arr[i].checked=false;
+            }
+        }
+
+    }
+    function plsc() {
+        var arr=document.getElementsByName("box");
+        str="";
+        var count=0;
+        for (var i = 0; i <arr.length ; i++) {
+            if (arr[i].checked) {
+                str+=arr[i].value+",";
+                count++;
+            }
+        }
+        str=str.substring(0,str.length-1)
+        if (count>0) {
+            if (confirm("你确定删除"+count+"条员工信息吗？")) {
+                $.post({
+                    url:"http://localhost:8088/emp/deleteempall",
+                    data:{"str":str},
+                    dataType:"json",
+                    success:function () {
+                        table1.ajax.reload();
+                    }
+                })
+            }
+        }else {
+            alert("没有员工信息！")
+        }
+
+    }
 </script>
  <body>
 <div class="container">
+
+    <div class="panel panel-default">
+           <div class="panel-heading">
+              <h3 class="panel-title">
+                 带有 title 的面板标题
+              </h3>
+           </div>
+           <div class="panel-body">
+               <button class="btn btn-success" onclick="add">新增员工</button>
+               <button class="btn btn-danger" onclick="plsc()">批量删除</button>
+               <button class="btn btn-primary" onclick="add">导出Excel</button>
+           </div>
+        </div>
+
+
+
  <table class="table table-striped" id="tab">
      <thead>
          <tr>
-             <td></td>
+             <td>
+                 <button class="btn btn-info" onclick="dian(1)">全选</button>
+                 <button  class="btn btn-info" onclick="dian(2)">反选</button>
+                 <button  class="btn btn-info" onclick="dian(3)">全不选</button>
+             </td>
              <td></td>
              <td></td>
              <td></td>

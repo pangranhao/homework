@@ -11,6 +11,10 @@
       select * from ssm_emp a left join ssm_job b on a.jobid = b.jobid left join ssm_dept c on a.deptid =c.deptid limit #{start},#{length}
    </select>
 
+    <delete id="deleteempall">
+        delete from ssm_emp where id in (${str})
+    </delete>
+
     <!-- <update id="updateisdel" >
         update ssm_stu set isdel=0 where id=#{id}
      </update>

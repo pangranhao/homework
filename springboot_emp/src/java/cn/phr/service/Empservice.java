@@ -6,4 +6,8 @@ import cn.phr.entity.vo.Dataparams;
 
 public interface Empservice {
     DataTablesData<Emp> queryemp(Dataparams dataparams);
+
+    void deleteemp(Integer id);
+
+    void deleteempall(String str);
 }

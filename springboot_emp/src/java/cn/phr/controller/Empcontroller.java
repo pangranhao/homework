@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Controller
 @RequestMapping("emp")
 @CrossOrigin
@@ -23,4 +26,30 @@ public class Empcontroller {
         DataTablesData<Emp>data=empservice.queryemp(dataparams);
         return data;
     }
+    @RequestMapping("deleteemp")
+    @ResponseBody
+    public Map deleteemp(Integer id){
+        Map map=new HashMap();
+        try{
+            empservice.deleteemp(id);
+            map.put("code",200);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return map;
+    }
+
+    @RequestMapping("deleteempall")
+    @ResponseBody
+    public Map deleteempall(String str){
+        Map map=new HashMap();
+        try{
+            empservice.deleteempall(str);
+            map.put("code",200);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return map;
+    }
+
 }
