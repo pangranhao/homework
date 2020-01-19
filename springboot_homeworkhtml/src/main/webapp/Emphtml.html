@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Emp</title>
+</head>
+
+
+<!-- 引入jquery  -->
+<script type="text/javascript" src="/js/jquery-3.3.1.min.js"></script>
+<!--引入ztree-->
+<link rel="stylesheet" href="/js/zTree-zTree_v3-master/css/zTreeStyle/zTreeStyle.css" type="text/css"/>
+<script src="/js/zTree-zTree_v3-master/js/jquery.ztree.all.min.js"></script>
+<!-- 引入bootstrap -->
+<link href="/js/bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="/js/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+<!-- 引入datatable -->
+<link href="/js/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="/js/DataTables/js/jquery.dataTables.min.js"></script>
+<!-- 引入bootbox -->
+<script type="text/javascript" src="/js/bootbox/bootbox.min.js"></script>
+<!-- 引入fileinput -->
+<link href="/js/bootstrap-fileinput-v5.0.6-17/css/fileinput.min.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="/js/bootstrap-fileinput-v5.0.6-17/js/fileinput.min.js"></script>
+
+
+<script>
+    var table1;//datatables对象
+    $(function(){
+        queryList();
+    });
+    //====================查询页面=========================
+    function queryList(){
+        table1=$('#tab').DataTable({
+            "serverSide": true,
+            "dataSrc":"data",
+            ajax: {
+                url:'http://localhost:8088/emp/queryemp',
+                type: 'POST',
+
+            },
+
+            language: {//国际化
+                "sProcessing": "处理中...",
+                "sLengthMenu": "每页 _MENU_ 条数据",
+                "sZeroRecords": "没有匹配结果",
+                "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
+                "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+                "sInfoPostFix": "",
+                "sSearch": "搜索:",
+                "sUrl": "",
+                "sEmptyTable": "表中数据为空",
+                "sLoadingRecords": "载入中...",
+                "sInfoThousands": ",",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "上页",
+                    "sNext": "下页",
+                    "sLast": "末页"
+                },
+                "oAria": {
+                    "sSortAscending": ": 以升序排列此列",
+                    "sSortDescending": ": 以降序排列此列"
+                }
+            },
+            processing:true,//开启请求进度
+            ordering:false,//是否启用排序b
+            searching: false,//是否启用搜索,
+
+            lengthMenu:[1,2,3],
+            columns: [
+                { data: 'id', "render": function ( data, type, row, meta ) {
+                        var str1='<input type="checkbox" name="box" value="'+row.id+'">';
+                        return str1;
+                    }},
+                {title:"员工姓名", data: 'name' },
+                {title:"岗位", data: 'jobname' },
+                {title:"工资", data: 'salary' },
+                /* {title:"是否处药方", data: 'isotc',"render": function(data,type,row,meta){
+
+                         return data==1?"是":"否";
+                     }
+                 },*/
+                { title:"入职时间",data: 'entrytime', "render": function(data,type,row,meta){
+                        var date=new Date(data);
+                        return timestampToTime(date);
+                    }},
+                {title:"领导姓名", data: 'leadername' },
+                {title:"部门名称", data: 'deptname' },
+                { title:"操作",data: 'bid', "render": function ( data, type, full, meta ) {
+                        var str='<button onclick="toUpdate('+data+')" class="btn btn-primary">修改</button><button  onclick="deletebook('+data+')" class="btn btn-danger">下架</button>';
+                        return str;
+                    }},
+            ]
+
+        });
+    }
+
+    //===============时间格式化+删除=====================
+    function timestampToTime(date) {
+        Y = date.getFullYear() + '-';
+        M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
+        D = date.getDate() + ' ';
+        return Y+M+D;
+
+    }
+</script>
+ <body>
+<div class="container">
+ <table class="table table-striped" id="tab">
+     <thead>
+         <tr>
+             <td></td>
+             <td></td>
+             <td></td>
+             <td></td>
+             <td></td>
+             <td></td>
+             <td></td>
+             <td></td>
+         </tr>
+     </thead>
+
+ </table>
+</div>
+</body>
+</html>
