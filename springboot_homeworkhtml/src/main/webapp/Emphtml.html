@@ -68,7 +68,7 @@
             ordering:false,//是否启用排序b
             searching: false,//是否启用搜索,
 
-            lengthMenu:[1,2,3],
+            lengthMenu:[3,4,5],
             columns: [
                 { data: 'id', "render": function ( data, type, row, meta ) {
                         var str1='<input type="checkbox" name="box" value="'+row.id+'">';
@@ -114,6 +114,15 @@ function deleteemp(id) {
         return Y+M+D;
 
     }
+    //====================条件查询+页面刷新========================
+    function search(){
+        var name=$("#name").val();
+        var jobid=$("#jobid").val();
+        var deptid=$("#deptid").val();
+        table1.settings()[0].ajax.data ={"name":name,"jobid":jobid,"deptid":deptid};
+        //重新加载datatables
+        table1.ajax.reload();
+    }
 
     function dian(c) {
         var arr=document.getElementsByName("box");
@@ -155,6 +164,10 @@ function deleteemp(id) {
         }
 
     }
+    function excelpro() {
+        var name=$("#name").val();
+        location.href="http://localhost:8088/emp/exclepro?name="+name;
+    }
 </script>
  <body>
 <div class="container">
@@ -166,9 +179,35 @@ function deleteemp(id) {
               </h3>
            </div>
            <div class="panel-body">
+               员工名：<input id="name">
+               入职年限：<select>
+                            <option>请选择</option>
+                            <option>1年以下</option>
+                               <option>3年以上</option>
+                               <option>5年以上</option>
+                               <option>10年以上</option>
+                          </select>
+               岗位：<select id="jobid">
+               <option value="-1">请选择</option>
+               <option value="1">开发</option>
+               <option value="2">项目经理</option>
+               <option value="3">人事专员</option>
+               <option value="4">总监</option>
+               <option value="5">1CTO首席执行官</option>
+           </select>
+               部门：<select id="deptid">
+               <option value="-1">请选择</option>
+               <option value="1">开发部</option>
+               <option value="2">人事部</option>
+               <option value="3">董事会</option>
+           </select>
+                <br><br>
+               <button class="btn btn-success" onclick="search()">搜索</button>
+
+
                <button class="btn btn-success" onclick="add">新增员工</button>
                <button class="btn btn-danger" onclick="plsc()">批量删除</button>
-               <button class="btn btn-primary" onclick="add">导出Excel</button>
+               <button class="btn btn-primary" onclick="excelpro()">导出Excel</button>
            </div>
         </div>
 

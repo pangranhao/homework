@@ -1,5 +1,7 @@
 package cn.phr.entity.po;
 
+import cn.phr.comm.Excel;
+import cn.phr.comm.ExcleHeard;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -8,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.util.Date;
 
 @TableName("ssm_emp")
+@ExcleHeard(title = "员工管理")
 public class Emp {
     /*ssm_emp.id,
     ssm_emp.jobid,
@@ -16,6 +19,7 @@ public class Emp {
     ssm_emp.deptid*/
     @TableId(value = "id",type = IdType.AUTO)
     private Integer id;
+    @Excel(name="名字")
     private String name;
     private Integer jobid;
     private String salary;

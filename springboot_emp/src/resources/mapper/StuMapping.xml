@@ -8,12 +8,29 @@
 </select>
 
    <select id="queryemp" parameterType="cn.phr.entity.vo.Dataparams" resultType="cn.phr.entity.po.Emp">
-      select * from ssm_emp a left join ssm_job b on a.jobid = b.jobid left join ssm_dept c on a.deptid =c.deptid limit #{start},#{length}
+      select * from ssm_emp a left join ssm_job b on a.jobid = b.jobids left join ssm_dept c on a.deptid =c.deptids where 1=1
+        <if test="name !=null and name !=''">
+            and name like concat('%',#{name},'%')
+        </if>
+       <if test="jobid!=null and jobid != -1">
+           and jobid=#{jobid}
+       </if>
+       <if test="deptid!=null and deptid != -1">
+           and deptid=#{deptid}
+       </if>
+       limit #{start},#{length}
    </select>
 
     <delete id="deleteempall">
         delete from ssm_emp where id in (${str})
     </delete>
+
+    <select id="queryemptoexcel" parameterType="cn.phr.entity.vo.Dataparams" resultType="cn.phr.entity.po.Emp">
+        select * from ssm_emp a left join ssm_job b on a.jobid = b.jobids left join ssm_dept c on a.deptid =c.deptids where 1=1
+        <if test="name !=null and name !=''">
+            and name like concat('%',#{name},'%')
+        </if>
+    </select>
 
     <!-- <update id="updateisdel" >
         update ssm_stu set isdel=0 where id=#{id}
