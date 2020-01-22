@@ -17,51 +17,19 @@ public class Emp {
     ssm_emp.salary,
     ssm_emp.entrytime,
     ssm_emp.deptid*/
-    @TableId(value = "id",type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
-    @Excel(name="名字")
+    @Excel(name = "名字")
     private String name;
-    private Integer jobid;
+    private String jobid;
     private String salary;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date entrytime;
-    private Integer deptid;
+    private String deptid;
     private String leadername;
 
     private String jobname;
     private String deptname;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getJobname() {
-        return jobname;
-    }
-
-    public void setJobname(String jobname) {
-        this.jobname = jobname;
-    }
-
-    public String getDeptname() {
-        return deptname;
-    }
-
-    public void setDeptname(String deptname) {
-        this.deptname = deptname;
-    }
-
-    public String getLeadername() {
-        return leadername;
-    }
-
-    public void setLeadername(String leadername) {
-        this.leadername = leadername;
-    }
 
     public Integer getId() {
         return id;
@@ -71,11 +39,19 @@ public class Emp {
         this.id = id;
     }
 
-    public Integer getJobid() {
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getJobid() {
         return jobid;
     }
 
-    public void setJobid(Integer jobid) {
+    public void setJobid(String jobid) {
         this.jobid = jobid;
     }
 
@@ -95,11 +71,35 @@ public class Emp {
         this.entrytime = entrytime;
     }
 
-    public Integer getDeptid() {
+    public String getDeptid() {
         return deptid;
     }
 
-    public void setDeptid(Integer deptid) {
+    public void setDeptid(String deptid) {
         this.deptid = deptid;
+    }
+
+    public String getLeadername() {
+        return leadername;
+    }
+
+    public void setLeadername(String leadername) {
+        this.leadername = leadername;
+    }
+
+    public String getJobname() {
+        return jobname;
+    }
+
+    public void setJobname(String jobname) {
+        this.jobname = jobname;
+    }
+
+    public String getDeptname() {
+        return deptname;
+    }
+
+    public void setDeptname(String deptname) {
+        this.deptname = deptname;
     }
 }

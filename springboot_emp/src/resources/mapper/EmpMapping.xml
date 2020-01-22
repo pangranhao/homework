@@ -32,6 +32,13 @@
         </if>
     </select>
 
+    <select id="queryempbuname" resultType="cn.phr.entity.po.Emp">
+        select * from ssm_emp where name=#{name}
+    </select>
+    <insert id="addempsd" parameterType="cn.phr.entity.po.Emp">
+        insert  into  ssm_emp(name,jobid,salary,entrytime,deptid,leadername) value (#{name},#{jobid},#{salary},#{entrytime},#{deptid},#{leadername})
+    </insert>
+
     <!-- <update id="updateisdel" >
         update ssm_stu set isdel=0 where id=#{id}
      </update>

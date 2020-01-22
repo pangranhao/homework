@@ -14,4 +14,8 @@ public interface Empservice {
     void deleteempall(String str);
 
     List<Emp> queryemptoexcel(Dataparams dataparams);
+
+    Emp queryempbuname(String name);
+
+    void addempsd(Emp emp);
 }

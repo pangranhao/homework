@@ -22,7 +22,9 @@
 <!-- 引入fileinput -->
 <link href="/js/bootstrap-fileinput-v5.0.6-17/css/fileinput.min.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="/js/bootstrap-fileinput-v5.0.6-17/js/fileinput.min.js"></script>
-
+<!-- 引入validate  -->
+<link href="/js/bootstrapvalidator-v0.5.2-0/dist/css/bootstrapValidator.min.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="/js/bootstrapvalidator-v0.5.2-0/dist/js/bootstrapValidator.min.js"></script>
 
 <script>
     var table1;//datatables对象
@@ -168,6 +170,144 @@ function deleteemp(id) {
         var name=$("#name").val();
         location.href="http://localhost:8088/emp/exclepro?name="+name;
     }
+    //查询岗位下拉数据
+    $(function () {
+        $.post({
+            url:"http://localhost:8088/job/queryjob",
+            dataType:"json",
+            success:function (data) {
+                for (var i = 0; i <data.length ; i++) {
+                    $("#job",emplog).append("<option value='"+data[i].jobids+"'>"+data[i].jobname+"</option>");
+                }
+            }
+        })
+        //加载部门信息
+        querydept();
+    })
+
+    //部门 领导联动
+    var deptData;
+    function querydept() {
+        var nodedept=[];
+    $.post({
+        url:"http://localhost:8088/dept/querydept",
+        dataType:"json",
+        async:false,
+        success:function (rs) {
+            deptData=rs;
+            for (var i = 0; i <deptData.length ; i++) {
+                if (deptData[i].pid==0) {
+                nodedept.push(rs[i]);
+                }
+            }
+        }
+    })
+        options='<option value="-1">请选择</option>'
+        for (var i = 0; i <nodedept.length ; i++) {
+            var datas=nodedept[i];
+            options+='<option value="'+datas.deptids+'">'+datas.deptname+'</option>'
+        }
+        $("#dept",emplog).html(options);
+    }
+    
+    function todept() {
+        var node2=[];
+        var deptid=$("#dept",emplog).val();
+        for (var i = 0; i <deptData.length ; i++) {
+            if (deptData[i].pid==deptid){
+                node2.push(deptData[i])
+            }
+        }
+        options='<option value="-1">请选择</option>'
+        for (var i = 0; i < node2.length; i++) {
+            var datas=node2[i];
+            options+='<option value="'+datas.deptids+'">'+datas.deptname+'</option>'
+        }
+        $("#deptpidc",emplog).html(options).show();
+    }
+
+    var emplog;
+    function addempss() {
+        var html = $("#empDiv").html();
+        emplog = bootbox.dialog({
+            title: "新增员工信息",
+            message: html
+        })
+        //初始化验证  在指定模块下 选择id
+        $("#frompro", emplog).bootstrapValidator({
+            feedbackIcons: {//相关提示图表
+                valid: 'glyphicon glyphicon-ok',//验证通过
+                invalid: 'glyphicon glyphicon-remove',//验证失败
+                validating: 'glyphicon glyphicon-refresh'//验证时
+            }
+            , fields: {//验证的元素
+                name: {
+                    validators: {//验证要求
+                        notEmpty: {
+                            message: "名称不能为空"
+                        }, stringLength: {
+                            max: 6,
+                            message: '用户名长度必须在1到6位之间'
+                        }
+                    }
+                }, salary: {
+                    validators: {//验证要求
+                        notEmpty: {
+                            message: "工资不能为空"
+                        }, stringLength: {
+                            max: 6,
+                            message: '请输入正确的工资'
+                        }
+                    }
+                },
+                job: {
+                    validators: {
+                        callback: {
+                            message: '必须选择一个用户',
+                            //返回true/false
+                            callback: function (value, validator) {
+                                if (value == "-1") {
+                                    return false;
+                                } else {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+            }
+        });
+    }
+
+    function adds(){
+        var name=$("#name",emplog).val();
+        var salary=$("#salary",emplog).val();
+        var entrytime=$("#entrytime",emplog).val();
+        var job=$("#job",emplog).val();
+        var dept=$("#dept",emplog).val()+","+$("#deptpidc",emplog).val();
+        $.post({
+            url:"http://localhost:8088/emp/addempsd",
+            data:{
+                "name":name,
+                "salary":salary,
+                "entrytime":entrytime,
+                "jobid":job,
+                "deptid":dept
+            },
+            dataType:"json",
+            success:function (rs) {
+                if (rs.code==200) {
+                    table1.ajax.reload();
+                    alert("保存成功")
+                }else {
+                    alert(rs.data.remark)
+                }
+            }
+        })
+    }
+
 </script>
  <body>
 <div class="container">
@@ -205,7 +345,7 @@ function deleteemp(id) {
                <button class="btn btn-success" onclick="search()">搜索</button>
 
 
-               <button class="btn btn-success" onclick="add">新增员工</button>
+               <button class="btn btn-success" onclick="addempss()">新增员工</button>
                <button class="btn btn-danger" onclick="plsc()">批量删除</button>
                <button class="btn btn-primary" onclick="excelpro()">导出Excel</button>
            </div>
@@ -233,5 +373,51 @@ function deleteemp(id) {
 
  </table>
 </div>
+
+
+ <div id="empDiv" style="display: none">
+     <form role="form" id="frompro">
+            <div class="form-group">
+              <label for="name">员工姓名：</label>
+               <input type="text" class="form-control" id="name" name="name"
+                                  placeholder="请输入名称">
+            </div>
+
+         <div class="form-group">
+             <label for="name">工资：</label>
+             <input type="number" class="form-control" id="salary" name="salary">
+         </div>
+
+         <div class="form-group">
+             <label for="name">入职时间：</label>
+             <input type="date" class="form-control" id="entrytime" name="entrytime" >
+         </div>
+
+         <div class="form-group">
+             <label for="name">岗位：</label>
+             <select id="job" name="job" class="form-control">
+                 <option>请选择</option>
+             </select>
+         </div>
+
+         <div class="form-group">
+             <label for="name">部门：</label>
+             <select id="dept" onchange="todept()" name="dept" class="form-control">
+             </select>
+         </div>
+
+         <div class="form-group" >
+             <label for="name">领导：</label>
+             <select id="deptpidc" style="display: none" class="form-control">
+             </select>
+         </div>
+
+         <div class="form-group">
+             <label for="name"></label>
+            <input type="button" value="保存" class="btn btn-success" onclick="adds()">
+         </div>
+     </form>
+
+ </div>
 </body>
 </html>

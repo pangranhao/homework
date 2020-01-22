@@ -15,4 +15,8 @@ public interface Empdao extends BaseMapper<Emp> {
     List<Emp> queryemp(Dataparams dataparams);
 
      List<Emp> queryemptoexcel(Dataparams dataparams);
+
+    Emp queryempbuname(String name);
+
+    void addempsd(Emp emp);
 }

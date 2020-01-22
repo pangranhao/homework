@@ -53,4 +53,14 @@ public class Empserviceiml implements Empservice {
         return empdao.queryemptoexcel(dataparams);
     }
 
+    @Override
+    public Emp queryempbuname(String name) {
+        return empdao.queryempbuname(name);
+    }
+
+    @Override
+    public void addempsd(Emp emp) {
+        empdao.addempsd(emp);
+    }
+
 }
