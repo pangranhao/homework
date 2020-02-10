@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>订票系统</title>
+
+</head>
+
+
+<!-- 引入jquery  -->
+<script type="text/javascript" src="/js/jquery-3.3.1.min.js"></script>
+<!--引入ztree-->
+<link rel="stylesheet" href="/js/zTree-zTree_v3-master/css/zTreeStyle/zTreeStyle.css" type="text/css"/>
+<script src="/js/zTree-zTree_v3-master/js/jquery.ztree.all.min.js"></script>
+<!-- 引入bootstrap -->
+<link href="/js/bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="/js/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+<!-- 引入datatable -->
+<link href="/js/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="/js/DataTables/js/jquery.dataTables.min.js"></script>
+<!-- 引入bootbox -->
+<script type="text/javascript" src="/js/bootbox/bootbox.min.js"></script>
+<!-- 引入fileinput -->
+<link href="/js/bootstrap-fileinput-v5.0.6-17/css/fileinput.min.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="/js/bootstrap-fileinput-v5.0.6-17/js/fileinput.min.js"></script>
+<!-- 引入validate  -->
+<link href="/js/bootstrapvalidator-v0.5.2-0/dist/css/bootstrapValidator.min.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="/js/bootstrapvalidator-v0.5.2-0/dist/js/bootstrapValidator.min.js"></script>
+<!--时间插件-->
+<script src="My97DatePicker/WdatePicker.js"></script>
+<script>
+
+    var table1;//datatables对象
+    $(function(){
+        queryList();
+    });
+    //====================查询页面=========================
+    function queryList(){
+        table1=$('#tab').DataTable({
+            "serverSide": true,
+            "dataSrc":"data",
+            ajax: {
+                url:'http://localhost:8088/flight/queryflight',
+                type: 'POST',
+
+            },
+
+            language: {//国际化
+                "sProcessing": "处理中...",
+                "sLengthMenu": "每页 _MENU_ 条数据",
+                "sZeroRecords": "没有匹配结果",
+                "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
+                "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+                "sInfoPostFix": "",
+                "sSearch": "搜索:",
+                "sUrl": "",
+                "sEmptyTable": "表中数据为空",
+                "sLoadingRecords": "载入中...",
+                "sInfoThousands": ",",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "上页",
+                    "sNext": "下页",
+                    "sLast": "末页"
+                },
+                "oAria": {
+                    "sSortAscending": ": 以升序排列此列",
+                    "sSortDescending": ": 以降序排列此列"
+                }
+            },
+            processing:true,//开启请求进度
+            ordering:false,//是否启用排序b
+            searching: false,//是否启用搜索,
+
+            lengthMenu:[3,4,5],
+            columns: [
+                { data: 'id', "render": function ( data, type, row, meta ) {
+                        var str1='<input type="checkbox" name="box" value="'+row.id+'">';
+                        return str1;
+                    }},
+                {title:"航班姓名", data: 'name',"render": function(data,type,row,meta){
+                    var typec=row.typeid
+                        var aa="";
+                        if(typec==1){
+                            aa="(小型客机)";
+                        } if(typec==3) {
+                            aa="(大型客机)"
+                        }if (typec==2) {
+                            aa="(中型客机)"
+                        }
+                        return row.name + " <br>" + row.typename + "<br>" + " " + aa + "";
+                    }
+
+                },
+
+              /*  { title:"起飞时间",data: 'starttime', "render": function(data,type,row,meta){
+                        var date=new Date(data);
+                        if(date>72000){
+                            return timestampToTime(date)+" <br>" + '临近起飞'+ ""+ " <br>[" + row.areaname + "]";
+                        }else {
+                            return timestampToTime(date)+ " <br>[" + row.areaname + "]";
+                        }
+
+                    }},*/
+                {title:"起飞时间", data: 'starttime',"render": function(data,type,row,meta){
+                    var area=row.startterminalid;
+                    var cc="";
+                        var date=new Date(data);
+                          var time=date.getTime();
+                          var b=new Date();
+                         var time1= b.getTime();
+
+                         if (time1-time<=7200000) {
+                             if (area==4){
+                                 cc="新郑机场"
+                             } if (area==5){
+                                 cc="大兴机场"
+                             } if (area==6){
+                                 cc="莲花机场"
+                             }
+                             start=("临近起飞")
+                             return data+"<br>"+start+"<br>"+cc;
+                         }else {
+                             if (area==4){
+                                 cc="新郑机场"
+                             } if (area==5){
+                                 cc="大兴机场"
+                             } if (area==6){
+                                 cc="莲花机场"
+                             }
+                             return data+"<br>"+cc;
+                         }
+
+
+                    } },
+                {title:"到达时间", data: 'enftime',"render": function(data,type,row,meta) {
+                        var area=row.endterminalid;
+                        var cc="";
+                    if (area==4){
+                        cc="新郑机场"
+                    } if (area==5){
+                        cc="大兴机场"
+                    } if (area==6){
+                        cc="莲花机场"
+                    }
+                    return data+"<br>"+cc;
+
+                            }},
+
+                {title:"票数", data: 'tptalcount' },
+                {title:"票价", data: 'price' },
+
+                { title:"操作",data: 'id', "render": function ( data, type, full, meta ) {
+                        var str='<button  onclick="dingpiao('+data+')" class=" btn-info">订票</button>' +
+                            '<button onclick="toUpdate('+data+')" class="  btn-warning">修改</button>' +
+                            '<button  onclick="updateisup('+data+')" class=" btn-danger">取消航班</button>';
+                        return str;
+                    }},
+            ]
+
+        });
+    }
+
+    //===============时间格式化+删除=====================
+    function timestampToTime(date) {
+        /* Y = date.getFullYear() + '年';
+        M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '月';
+        D = date.getDate() + ' ';
+         h = date.getHours()+":";          //获取小时
+         m = date.getMinutes();        //获取分钟
+        return Y+M+D+h+m;*/
+    }
+//到处Excel
+    function Exclepro() {
+        location.href="http://localhost:8088/flight/Excelpro"
+    }
+//条件查询
+    function search(){
+        var name=$("#name").val();
+        var startdate=$("#startdate").val();
+        var secc=$("#secc").val();
+        var startterminalid=$("#startterminalid").val();
+        table1.settings()[0].ajax.data ={"name":name,"startdate":startdate,"typeid":secc,"startterminalid":startterminalid};
+        //重新加载datatables
+        table1.ajax.reload();
+    }
+//取消航班
+    function updateisup(id){
+        $.post({
+            url:"http://localhost:8088/flight/updateisup",
+            data:{"id":id},
+            dataType:"json",
+            success:function (rs) {
+                if (rs.code==200) {
+                    table1.ajax.reload();
+                }
+            }
+        })
+    }
+
+    //全选按钮
+    function dian(c) {
+        var arr=document.getElementsByName("box");
+        for (var i = 0; i < arr.length; i++) {
+            if (c==1) {
+                arr[i].checked=true;
+            } if (c==3) {
+                arr[i].checked=!arr[i].checked;
+            }if (c==2) {
+                arr[i].checked=false;
+            }
+        }
+    }
+    //批量取消航班
+    function plqx(){
+        var arr=document.getElementsByName("box");
+        str="";
+        var count=0;
+        for (var i = 0; i <arr.length ; i++) {
+            if (arr[i].checked) {
+                str+=arr[i].value+",";
+                count++;
+            }
+        }
+        str=str.substring(0,str.length-1)
+        if (count>0) {
+            if (confirm("你确定取消"+count+"条航班吗？")) {
+                $.post({
+                    url:"http://localhost:8088/flight/updateisupall",
+                    data:{"str":str},
+                    dataType:"json",
+                    success:function () {
+                        table1.ajax.reload();
+                    }
+                })
+            }
+        }else {
+            alert("没有航班了！")
+        }
+
+    }
+    //订票
+    function dingpiao(id){
+        $.post({
+            url:"http://localhost:8088/ticket/updateticket",
+            data:{"id":id},
+            dateType:"json",
+            success:function (rs) {
+                if (rs.code==200) {
+                    table1.ajax.reload();
+                }
+            }
+        })
+    }
+
+    //查询机型的表
+    $(function () {
+        $.post({
+            url:"http://localhost:8088/type/querytype",
+            dataType:"json",
+            success:function (data) {
+                for (var i = 0; i <data.length ; i++) {
+                    $("#typese",addflightlog).append("<option value='"+data[i].typeids+"'>"+data[i].typename+"</option>")
+                    $("#uptypese",upflightlog).append("<option value='"+data[i].typeids+"'>"+data[i].typename+"</option>")
+                    $("#secc").append("<option value='"+data[i].typeids+"'>"+data[i].typename+"</option>")
+                }
+            }
+        })
+        //加载下面的机场地区
+        queryarea();
+        queryareas();
+    })
+    //查询机场地区
+    var areadata;
+    function queryarea() {
+        var areaarr=[];
+        $.post({
+            url:"http://localhost:8088/area/queryarea",
+            dataType:"json",
+            async:false,
+            success:function (rs) {
+                areadata=rs;
+                for (var i = 0; i <areadata.length ; i++) {
+                if (areadata[i].pid==0) {
+                    areaarr.push(rs[i])
+                }
+                }
+            }
+        })
+        var options='<option value="-1">请选择</option>'
+        for (var i = 0; i <areaarr.length ; i++) {
+            var data=areaarr[i];
+            options+='<option value="'+data.areaid+'">'+data.areaname+'</option>'
+        }
+
+        $("#arease",addflightlog).html(options);
+    }
+    //二级
+
+    function toarea2() {
+        var areaarr2 = [];
+        var arease = $("#arease", addflightlog).val();
+        if (arease!= -1) {
+            for (var i = 0; i < areadata.length; i++) {
+                if (areadata[i].pid == arease) {
+                    areaarr2.push(areadata[i])
+                }
+            }
+            var options = '<option value="-1">请选择</option>'
+            for (var i = 0; i < areaarr2.length; i++) {
+                var data = areaarr2[i];
+                options += '<option value="' + data.areaid + '">' + data.areaname + '</option>'
+            }
+            $("#arease2", addflightlog).html(options).show();
+        }
+        else {
+            $("#arease2", addflightlog).html(options).hide();
+        }
+    }
+
+    //三级
+    function toarea3() {
+        var areaarr3=[];
+        var arease2=$("#arease2",addflightlog).val();
+        if (arease2!= -1){
+        for (var i = 0; i < areadata.length; i++) {
+            if (areadata[i].pid==arease2) {
+                areaarr3.push(areadata[i])
+            }
+        }
+        var options='<option value="-1">请选择</option>'
+        for (var i = 0; i <areaarr3.length ; i++) {
+            var datas=areaarr3[i];
+            options+='<option value="'+datas.areaid+'">'+datas.areaname+'</option>'
+        }
+        $("#arease3",addflightlog).html(options).show();
+    }else {
+            $("#arease3",addflightlog).html(options).hide();
+        }
+    }
+
+    //到达机场
+    //查询机场地区
+    var areadatas;
+    function queryareas() {
+        var areaarr=[];
+        $.post({
+            url:"http://localhost:8088/area/queryarea",
+            dataType:"json",
+            async:false,
+            success:function (rs) {
+                areadatas=rs;
+                for (var i = 0; i <areadatas.length ; i++) {
+                    if (areadatas[i].pid==0) {
+                        areaarr.push(rs[i])
+                    }
+                }
+            }
+        })
+        var options='<option value="-1">请选择</option>'
+        for (var i = 0; i <areaarr.length ; i++) {
+            var data=areaarr[i];
+            options+='<option value="'+data.areaid+'">'+data.areaname+'</option>'
+        }
+
+        $("#area",addflightlog).html(options);
+    }
+    //二级
+    function areaA() {
+        var areaarr2=[];
+        var area=$("#area",addflightlog).val();
+        if (area!= -1){
+        for (var i = 0; i <areadatas.length ; i++) {
+            if (areadata[i].pid==area) {
+                areaarr2.push(areadatas[i])
+            }
+        }
+        var options='<option value="-1">请选择</option>'
+        for (var i = 0; i <areaarr2.length ; i++) {
+            var data=areaarr2[i];
+            options+='<option value="'+data.areaid+'">'+data.areaname+'</option>'
+        }
+        $("#areab",addflightlog).html(options).show();
+    }else {
+            $("#areab",addflightlog).html(options).hide();
+        }
+    }
+
+    //三级
+    function areaB() {
+        var areaarr3=[];
+        var areab=$("#areab",addflightlog).val();
+        if (areab!= -1){
+        for (var i = 0; i < areadatas.length; i++) {
+            if (areadatas[i].pid==areab) {
+                areaarr3.push(areadatas[i])
+            }
+        }
+        var options='<option value="-1">请选择</option>'
+        for (var i = 0; i <areaarr3.length ; i++) {
+            var datas=areaarr3[i];
+            options+='<option value="'+datas.areaid+'">'+datas.areaname+'</option>'
+        }
+        $("#areac",addflightlog).html(options).show();
+    }else {
+            $("#areac",addflightlog).html(options).hide();
+        }
+    }
+    
+    //处理+票
+    function dianji() {
+          var tptalcount=$("#tptalcount",addflightlog).val();
+            var num=Number(tptalcount)+1;
+         $("#tptalcount",addflightlog).val(num);
+         $("#price",addflightlog).val(num*200);
+    }
+
+    function dianji2() {
+        var tptalcount=$("#tptalcount2",addflightlog).val();
+        var num=Number(tptalcount)+1;
+        $("#tptalcount2",addflightlog).val(num);
+        $("#price2",addflightlog).val(num*500);
+    }
+    //查询仓ticket
+    $(function () {
+        $.post({
+            url:"http://localhost:8088/ticket/queryticket",
+            dataType:"json",
+            success:function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    $("#ticketse",addflightlog).append("<option value='"+data[i].id+"'>"+data[i].typenames+"</option>")
+                    $("#ticketse2",addflightlog).append("<option value='"+data[i].id+"'>"+data[i].typenames+"</option>")
+                }
+            }
+        })
+    })
+
+    //新增弹出
+    var addflightlog;
+    function addflight() {
+        var html=$("#addflightDiv").html();
+        addflightlog=bootbox.dialog({
+            title:"添加航班",
+            message:html
+        })
+    }
+    function addflights() {
+      var name=$("#name",addflightlog).val();
+        var starttime=$("#starttime",addflightlog).val();
+        var enftime=$("#enftime",addflightlog).val();
+        var typeid=$("#typese",addflightlog).val();
+        var startterminalid=$("#arease",addflightlog).val()+","+$("#arease2",addflightlog).val()+","+$("#arease3",addflightlog).val();
+        var endterminalid=$("#area",addflightlog).val()+","+$("#areab",addflightlog).val()+","+$("#areac",addflightlog).val();
+        var tptalcount=$("#tptalcount",addflightlog).val();
+        var price=$("#price",addflightlog).val();
+        $.post({
+            url:"http://localhost:8088/flight/addflight",
+            data:{
+                "name":name,
+                "starttime":starttime,
+                "enftime":enftime,
+                "typeid":typeid,
+                "startterminalid":startterminalid,
+                "endterminalid":endterminalid,
+                "tptalcount":tptalcount,
+                "price":price
+            },
+            dataType:"json",
+            success:function (rs) {
+                if (rs.code==200) {
+                    addflightlog.modal("hide");
+                    table1.ajax.reload();
+                }else {
+                    alert("添加失败");
+                }
+
+            }
+        })
+    }
+
+    /*=======================修改================================*/
+    var upflightlog;
+    function toUpdate(id) {
+        var html=$("#upflightDiv").html();
+        upflightlog=bootbox.dialog({
+            title:"修改航班",
+            message:html
+        })
+        $.post({
+            url:"http://localhost:8088/flight/queryid",
+            data:{"id":id},
+            dataType:"json",
+            success:function (rs) {
+                $("#id",upflightlog).val(rs.id);
+                $("#upname",upflightlog).val(rs.name);
+                $("#upstarttime",upflightlog).val(rs.starttime);
+                $("#upenftime",upflightlog).val(rs.enftime);
+                $("#uptypese",upflightlog).val(rs.typeid);
+                $("#upstartterminalid",upflightlog).val(rs.startterminalid.replace(4,"新郑机场").replace(5,"大兴机场").replace(6,"莲花机场"));
+                $("#upendterminalid",upflightlog).val(rs.endterminalid.replace(4,"新郑机场").replace(5,"大兴机场").replace(6,"莲花机场"));
+            }
+        })
+    }
+
+    function upflights() {
+        var id=$("#id",upflightlog).val();
+        var name=$("#upname",upflightlog).val();
+        var starttime=$("#upstarttime",upflightlog).val();
+        var enftime=$("#upenftime",upflightlog).val();
+        var typeid=$("#uptypese",upflightlog).val();
+        $.post({
+            url:"http://localhost:8088/flight/updateflight",
+            data:{
+                "id":id,
+                "name":name,
+                "starttime":starttime,
+                "enftime":enftime,
+                "typeid":typeid,
+
+            },
+            dataType:"json",
+            success:function (rs) {
+                if (rs.code==200) {
+                    upflightlog.modal("hide");
+                    table1.ajax.reload();
+                }else {
+                    alert("添加失败");
+                }
+
+            }
+        })
+    }
+</script>
+
+
+<body>
+
+
+<div class="container">
+
+    <div class="panel panel-default">
+       <div class="panel-heading">
+          航空订票系统
+       </div>
+       <div class="panel-body">
+           航班名称：<input id="name">
+           起飞时间：<input id="startdate"type="date">
+           &nbsp&nbsp机型类型:<select id="secc">
+           <option>请选择</option>
+             </select>
+           <!--<br><br>
+           机票类型:<input type="radio" value="1">经济舱<input type="radio" value="2">头等舱 &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+           是否有票:<input type="radio" value="1">是<input type="radio" value="2">否<br><br>
+
+           出发城市：<input id="startterminalid"><br><br>
+           到达城市：<input id="endterminalid">--><br><br>
+            <button class="btn-success" onclick="search()">搜索</button>
+           <button class="btn-danger" onclick="history.go(0)">重置</button>
+        <br><br>
+         <button class="btn-success" onclick="addflight()">新增航班</button>
+           <button class="btn-danger" onclick="plqx()">批量取消航班</button>
+           <button class="btn-info" onclick="Exclepro()">导出航班Excel</button>
+       </div>
+    </div>
+
+    <table id="tab">
+        <thead>
+        <tr>
+            <td>
+                <button class="btn-info" onclick="dian(1)">全选</button>
+                <button class="btn-info" onclick="dian(2)">全不选</button>
+                <button class="btn-info" onclick="dian(3)">反选</button>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        </thead>
+
+    </table>
+</div>
+
+
+
+<!--=================================新增航班============================================-->
+
+<div id="addflightDiv" style="display: none">
+
+    <form class="form-horizontal" role="form">
+           <div class="form-group">
+             <label for="firstname" class="col-sm-2 control-label">航班名称</label>
+              <div class="col-sm-10">
+                 <input type="text" class="form-control" id="name" style="width: 150px"
+                                       placeholder="请输入名字">
+              </div>
+           </div>
+
+        <div class="form-group">
+            <label for="firstname" class="col-sm-2 control-label">起飞时间</label>
+            <div class="col-sm-10">
+                <input onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"  class="form-control" id="starttime" style="width: 150px">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="firstname" class="col-sm-2 control-label">到达时间</label>
+            <div class="col-sm-10">
+                <input onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" class="form-control" id="enftime" style="width: 150px" >
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="firstname" class="col-sm-2 control-label">机型</label>
+            <div class="col-sm-10">
+               <select id="typese"></select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="firstname" class="col-sm-2 control-label">出发机场</label>
+            <div class="col-sm-10">
+                <select id="arease" onchange="toarea2()"></select>
+                <select id="arease2" style="display: none" onclick="toarea3()"></select>
+                <select id="arease3" style="display: none"></select>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label for="firstname" class="col-sm-2 control-label">到达机场</label>
+            <div class="col-sm-10">
+                <select id="area" onchange="areaA()"></select>
+                <select id="areab" onchange="areaB()" style="display: none"></select>
+                <select id="areac" style="display: none"></select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="firstname" class="col-sm-2 control-label">机票</label>
+            <div class="col-sm-10">
+                <select id="ticketse"></select>
+                <input  style="width: 150px" value="0" id="tptalcount">
+                <input  style="width: 150px" id="price">
+                <input type="button" value="+" onclick="dianji()" class="btn-default">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="firstname" class="col-sm-2 control-label"></label>
+            <div class="col-sm-10">
+                <select id="ticketse2"></select>
+                <input  style="width: 150px" id="tptalcount2" value="0">
+                <input  style="width: 150px" id="price2">
+                <input type="button" value="+" onclick="dianji2()" class="btn-default">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="firstname" class="col-sm-2 control-label"></label>
+            <div class="col-sm-10">
+                <input type="button"value="提交" onclick="addflights()" class="btn btn-success">
+                <input type="reset"value="重置" class="btn btn-danger">
+            </div>
+        </div>
+
+    </form>
+
+</div>
+
+
+<!--================================修改==================================-->
+<div id="upflightDiv" style="display: none">
+
+    <form class="form-horizontal" role="form">
+        <div class="form-group">
+            <label for="firstname" class="col-sm-2 control-label">航班名称</label>
+            <div class="col-sm-10">
+                <input id="id" type="hidden">
+                <input type="text" class="form-control" id="upname" style="width: 150px"
+                       placeholder="请输入名字">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="firstname" class="col-sm-2 control-label">起飞时间</label>
+            <div class="col-sm-10">
+                <input onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"  class="form-control" id="upstarttime" style="width: 150px">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="firstname" class="col-sm-2 control-label">到达时间</label>
+            <div class="col-sm-10">
+                <input onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" class="form-control" id="upenftime" style="width: 150px" >
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="firstname" class="col-sm-2 control-label">机型</label>
+            <div class="col-sm-10">
+                <select id="uptypese"></select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="firstname" class="col-sm-2 control-label">出发机场</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="upstartterminalid" style="width: 150px" readonly="readonly">
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label for="firstname" class="col-sm-2 control-label">到达机场</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="upendterminalid" style="width: 150px" readonly="readonly">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="firstname" class="col-sm-2 control-label">机票</label>
+            <div class="col-sm-10">
+                <select id="ticketse"></select>
+                <input  style="width: 150px" value="0" id="tptalcount">
+                <input  style="width: 150px" id="price">
+                <input type="button" value="+" onclick="dianji()" class="btn-default">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="firstname" class="col-sm-2 control-label"></label>
+            <div class="col-sm-10">
+                <select id="ticketse2"></select>
+                <input  style="width: 150px" id="tptalcount2" value="0">
+                <input  style="width: 150px" id="price2">
+                <input type="button" value="+" onclick="dianji2()" class="btn-default">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="firstname" class="col-sm-2 control-label"></label>
+            <div class="col-sm-10">
+                <input type="button"value="提交" onclick="upflights()" class="btn btn-success">
+                <input type="reset"value="重置" class="btn btn-danger">
+            </div>
+        </div>
+
+    </form>
+
+</div>
+
+
+
+</body>
+</html>
